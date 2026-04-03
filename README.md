@@ -213,9 +213,9 @@ This dashboard is designed to answer the questions a **Data Analyst at Razorpay 
 
 ## 📬 Contact
 
-**[Your Name]** — Data Analyst | AI/ML Engineer  
-📧 your.email@gmail.com  
-🔗 [LinkedIn](https://linkedin.com/in/yourprofile) | [GitHub](https://github.com/yourusername)
+**Nilesh Sahoo** — Data Analyst | AI/ML Engineer  
+📧 nileshsahoo837@gmail.com  
+
 
 ---
 
