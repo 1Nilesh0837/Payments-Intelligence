@@ -1,0 +1,316 @@
+# ============================================================
+#   UPI PULSE — COMPLETE DAX MEASURES REFERENCE
+#   Copy-paste these into Power BI DAX editor
+#   Table name: upi_transactions
+# ============================================================
+
+# ────────────────────────────────────────────────────────────
+# 1. CORE KPI MEASURES
+# ────────────────────────────────────────────────────────────
+
+Total Transactions = 
+    COUNTROWS(upi_transactions)
+
+Total Volume (₹) = 
+    SUM(upi_transactions[amount_inr])
+
+Average Ticket Size = 
+    AVERAGE(upi_transactions[amount_inr])
+
+Success Rate % = 
+    DIVIDE(
+        CALCULATE(COUNTROWS(upi_transactions), upi_transactions[status] = "Success"),
+        COUNTROWS(upi_transactions),
+        0
+    ) * 100
+
+Failed Rate % = 
+    DIVIDE(
+        CALCULATE(COUNTROWS(upi_transactions), upi_transactions[status] = "Failed"),
+        COUNTROWS(upi_transactions),
+        0
+    ) * 100
+
+Pending Rate % = 
+    DIVIDE(
+        CALCULATE(COUNTROWS(upi_transactions), upi_transactions[status] = "Pending"),
+        COUNTROWS(upi_transactions),
+        0
+    ) * 100
+
+Total Cashback (₹) = 
+    SUM(upi_transactions[cashback_inr])
+
+Fraud Transactions = 
+    CALCULATE(COUNTROWS(upi_transactions), upi_transactions[fraud_flag] = 1)
+
+Fraud Rate % = 
+    DIVIDE([Fraud Transactions], [Total Transactions], 0) * 100
+
+
+# ────────────────────────────────────────────────────────────
+# 2. TIME INTELLIGENCE MEASURES
+# ────────────────────────────────────────────────────────────
+
+Volume MoM % Change = 
+    VAR CurrentMonth = [Total Volume (₹)]
+    VAR PrevMonth = 
+        CALCULATE(
+            SUM(upi_transactions[amount_inr]),
+            DATEADD(upi_transactions[date], -1, MONTH)
+        )
+    RETURN
+        DIVIDE(CurrentMonth - PrevMonth, PrevMonth, 0) * 100
+
+Transactions MoM % Change = 
+    VAR CurrentMonth = [Total Transactions]
+    VAR PrevMonth = 
+        CALCULATE(
+            COUNTROWS(upi_transactions),
+            DATEADD(upi_transactions[date], -1, MONTH)
+        )
+    RETURN
+        DIVIDE(CurrentMonth - PrevMonth, PrevMonth, 0) * 100
+
+Volume YoY % Change = 
+    VAR CurrentYear = [Total Volume (₹)]
+    VAR PrevYear = 
+        CALCULATE(
+            SUM(upi_transactions[amount_inr]),
+            SAMEPERIODLASTYEAR(upi_transactions[date])
+        )
+    RETURN
+        DIVIDE(CurrentYear - PrevYear, PrevYear, 0) * 100
+
+Rolling 7-Day Transactions = 
+    CALCULATE(
+        COUNTROWS(upi_transactions),
+        DATESINPERIOD(
+            upi_transactions[date],
+            LASTDATE(upi_transactions[date]),
+            -7,
+            DAY
+        )
+    )
+
+Rolling 30-Day Volume = 
+    CALCULATE(
+        SUM(upi_transactions[amount_inr]),
+        DATESINPERIOD(
+            upi_transactions[date],
+            LASTDATE(upi_transactions[date]),
+            -30,
+            DAY
+        )
+    )
+
+Cumulative Volume = 
+    CALCULATE(
+        SUM(upi_transactions[amount_inr]),
+        DATESYTD(upi_transactions[date])
+    )
+
+Weekend Volume = 
+    CALCULATE(
+        SUM(upi_transactions[amount_inr]),
+        upi_transactions[is_weekend] = 1
+    )
+
+Weekday Volume = 
+    CALCULATE(
+        SUM(upi_transactions[amount_inr]),
+        upi_transactions[is_weekend] = 0
+    )
+
+Festival Day Volume = 
+    CALCULATE(
+        SUM(upi_transactions[amount_inr]),
+        upi_transactions[is_festival_day] = 1
+    )
+
+
+# ────────────────────────────────────────────────────────────
+# 3. USER BEHAVIOR MEASURES
+# ────────────────────────────────────────────────────────────
+
+Repeat User Transactions = 
+    CALCULATE(
+        COUNTROWS(upi_transactions),
+        upi_transactions[is_repeat_user] = 1
+    )
+
+New User Transactions = 
+    CALCULATE(
+        COUNTROWS(upi_transactions),
+        upi_transactions[is_new_user] = 1
+    )
+
+Repeat User Rate % = 
+    DIVIDE([Repeat User Transactions], [Total Transactions], 0) * 100
+
+Avg Ticket - Repeat Users = 
+    CALCULATE(
+        AVERAGE(upi_transactions[amount_inr]),
+        upi_transactions[is_repeat_user] = 1
+    )
+
+Avg Ticket - New Users = 
+    CALCULATE(
+        AVERAGE(upi_transactions[amount_inr]),
+        upi_transactions[is_new_user] = 1
+    )
+
+
+# ────────────────────────────────────────────────────────────
+# 4. PAYMENT APP MEASURES
+# ────────────────────────────────────────────────────────────
+
+PhonePe Market Share % = 
+    DIVIDE(
+        CALCULATE(COUNTROWS(upi_transactions), upi_transactions[payment_app] = "PhonePe"),
+        CALCULATE(COUNTROWS(upi_transactions), ALL(upi_transactions[payment_app])),
+        0
+    ) * 100
+
+Google Pay Market Share % = 
+    DIVIDE(
+        CALCULATE(COUNTROWS(upi_transactions), upi_transactions[payment_app] = "Google Pay"),
+        CALCULATE(COUNTROWS(upi_transactions), ALL(upi_transactions[payment_app])),
+        0
+    ) * 100
+
+App Market Share % = 
+    DIVIDE(
+        COUNTROWS(upi_transactions),
+        CALCULATE(COUNTROWS(upi_transactions), ALL(upi_transactions[payment_app])),
+        0
+    ) * 100
+
+App Success Rate % = 
+    DIVIDE(
+        CALCULATE(COUNTROWS(upi_transactions), upi_transactions[status] = "Success"),
+        COUNTROWS(upi_transactions),
+        0
+    ) * 100
+
+
+# ────────────────────────────────────────────────────────────
+# 5. GEO MEASURES
+# ────────────────────────────────────────────────────────────
+
+Tier 1 Volume = 
+    CALCULATE(
+        SUM(upi_transactions[amount_inr]),
+        upi_transactions[city_tier] = "Tier 1"
+    )
+
+Tier 2 Volume = 
+    CALCULATE(
+        SUM(upi_transactions[amount_inr]),
+        upi_transactions[city_tier] = "Tier 2"
+    )
+
+Tier 1 vs Tier 2 Ratio = 
+    DIVIDE([Tier 1 Volume], [Tier 2 Volume], 0)
+
+State Volume Share % = 
+    DIVIDE(
+        SUM(upi_transactions[amount_inr]),
+        CALCULATE(SUM(upi_transactions[amount_inr]), ALL(upi_transactions[state])),
+        0
+    ) * 100
+
+
+# ────────────────────────────────────────────────────────────
+# 6. WHAT-IF ANALYSIS MEASURES
+#    (Create a "Success Rate Improvement" parameter: 0–20%, step 1%)
+# ────────────────────────────────────────────────────────────
+
+Projected Volume Gain = 
+    VAR CurrentFailedVolume = 
+        CALCULATE(
+            SUM(upi_transactions[amount_inr]),
+            upi_transactions[status] = "Failed"
+        )
+    VAR ImprovementFactor = 'Success Rate Improvement'[Success Rate Improvement Value] / 100
+    RETURN
+        CurrentFailedVolume * ImprovementFactor
+
+Projected New Success Rate = 
+    [Success Rate %] + 'Success Rate Improvement'[Success Rate Improvement Value]
+
+
+# ────────────────────────────────────────────────────────────
+# 7. ANOMALY / FRAUD MEASURES
+# ────────────────────────────────────────────────────────────
+
+Fraud Volume = 
+    CALCULATE(
+        SUM(upi_transactions[amount_inr]),
+        upi_transactions[fraud_flag] = 1
+    )
+
+Night Hour Failures = 
+    CALCULATE(
+        COUNTROWS(upi_transactions),
+        upi_transactions[status] = "Failed",
+        upi_transactions[hour] >= 0,
+        upi_transactions[hour] <= 5
+    )
+
+High Value Transactions = 
+    CALCULATE(
+        COUNTROWS(upi_transactions),
+        upi_transactions[amount_inr] > 10000
+    )
+
+High Value Volume = 
+    CALCULATE(
+        SUM(upi_transactions[amount_inr]),
+        upi_transactions[amount_inr] > 10000
+    )
+
+
+# ────────────────────────────────────────────────────────────
+# 8. RANKING MEASURES (for bar chart sorting)
+# ────────────────────────────────────────────────────────────
+
+State Rank by Volume = 
+    RANKX(
+        ALL(upi_transactions[state]),
+        CALCULATE(SUM(upi_transactions[amount_inr])),
+        ,
+        DESC,
+        DENSE
+    )
+
+Category Rank by Transactions = 
+    RANKX(
+        ALL(upi_transactions[merchant_category]),
+        CALCULATE(COUNTROWS(upi_transactions)),
+        ,
+        DESC,
+        DENSE
+    )
+
+
+# ────────────────────────────────────────────────────────────
+# 9. DYNAMIC TITLE MEASURES (for report page titles)
+# ────────────────────────────────────────────────────────────
+
+Selected App Title = 
+    IF(
+        ISFILTERED(upi_transactions[payment_app]),
+        "App: " & SELECTEDVALUE(upi_transactions[payment_app], "All Apps"),
+        "All Payment Apps"
+    )
+
+Selected Period Title = 
+    IF(
+        ISFILTERED(upi_transactions[month_name]),
+        SELECTEDVALUE(upi_transactions[month_name], "Full Year") & " 2024",
+        "Full Year 2024"
+    )
+
+KPI Card Subtitle = 
+    "UPI Transactions · Jan–Dec 2024 · " & FORMAT([Total Transactions], "#,##0") & " records"

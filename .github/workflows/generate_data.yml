@@ -1,0 +1,30 @@
+name: Generate UPI Dataset
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+    
+    - name: Generate dataset
+      run: |
+        cd data
+        python generate_data.py
+    
+    - name: Run EDA
+      run: |
+        cd data
+        python eda_analysis.py

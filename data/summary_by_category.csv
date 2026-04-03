@@ -1,0 +1,12 @@
+merchant_category,transactions,total_volume,avg_ticket,success_rate
+Education,2454,12325605,5022.66,92.67
+Investments & EMI,1019,8514771,8356.01,93.52
+Travel & Transport,4013,8146253,2029.97,92.97
+Utility Bills,5006,7495325,1497.27,89.61
+Shopping & Fashion,6003,7396542,1232.14,92.7
+Groceries,8813,7144102,810.63,92.49
+P2P Transfer,2056,6357202,3092.02,91.93
+Healthcare,3035,5729072,1887.67,93.08
+Fuel,2541,5567980,2191.26,92.33
+Food & Dining,11001,3872122,351.98,93.04
+Entertainment,4059,2045167,503.86,92.41

@@ -1,0 +1,7 @@
+payment_app,transactions,total_volume,avg_ticket,success_rate,cashback_given,market_share_%
+PhonePe,23980,35556995,1482.78,92.53,18441.94,48.0
+Google Pay,17559,26325186,1499.24,92.35,63332.24,35.1
+Paytm,4525,6900926,1525.07,91.93,0.0,9.0
+CRED,2012,2892287,1437.52,92.79,77238.08,4.0
+WhatsApp Pay,971,1459497,1503.09,92.89,0.0,1.9
+Amazon Pay,953,1459250,1531.22,91.71,0.0,1.9
